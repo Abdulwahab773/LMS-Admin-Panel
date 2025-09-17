@@ -7,6 +7,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { Link } from "react-router-dom";
+import NavbarCmp from "../../components/navbar";
 
 function AdminPanel() {
   const [courseName, setCourseName] = useState("");
@@ -69,98 +70,170 @@ console.log(enrolled);
 
   return (
     <>
-      <h1 className="text-center font-semibold text-3xl mt-3">Admin Panel</h1>
+<NavbarCmp />
+
+
       <div>
-        <h1 className="font-semibold text-xl mt-5 mb-5">Add Course Section:</h1>
+       
 
-        <div className="flex flex-col gap-5 ">
-          <input
-            className="border p-1 w-68"
-            placeholder="Enter Course Name"
-            type="text"
-            onChange={(e) => setCourseName(e.target.value)}
-            value={courseName}
-          />
 
-          <input
-            className="border p-1 w-68"
-            placeholder="Enter Course description"
-            type="text"
-            onChange={(e) => setCourseDesc(e.target.value)}
-            value={courseDesc}
-          />
-          <input
-            className="border p-1 w-68"
-            placeholder="Enter Course Price"
-            type="number"
-            onChange={(e) => setCoursePrice(e.target.value)}
-            value={coursePrice}
-          />
 
-          <input className="border p-1 w-68" placeholder="Image" type="file" />
+      
+<div className="max-w-2xl mx-auto mt-10 bg-gray-900 shadow-lg rounded-xl p-6 space-y-6">
+  <h2 className="text-2xl font-bold text-center text-white">Add New Course</h2>
 
-          <button
-            onClick={addCourse}
-            className="border p-2 w-36 ml-10 cursor-pointer bg-green-500 hover:bg-green-600 hover:text-white"
-          >
-            Add Course
-          </button>
-        </div>
+  
+  <div>
+    <label
+      htmlFor="course-name"
+      className="block text-sm font-medium text-gray-300"
+    >
+      Course Name
+    </label>
+    <input
+      id="course-name"
+      className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 text-white p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+      placeholder="Enter Course Name"
+      type="text"
+      onChange={(e) => setCourseName(e.target.value)}
+      value={courseName}
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-300">
+      Course Description
+    </label>
+    <input
+      className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 text-white p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+      placeholder="Enter Course Description"
+      type="text"
+      onChange={(e) => setCourseDesc(e.target.value)}
+      value={courseDesc}
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-300">
+      Course Price
+    </label>
+    <input
+      className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 text-white p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+      placeholder="Enter Course Price"
+      type="number"
+      onChange={(e) => setCoursePrice(e.target.value)}
+      value={coursePrice}
+    />
+  </div>
+
+  <div>
+    <label className="block text-sm font-medium text-gray-300">
+      Upload Image
+    </label>
+    <input
+      className="mt-1 block w-full rounded-md border border-gray-700 bg-gray-800 text-white p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
+      type="file"
+    />
+  </div>
+
+
+  <button
+    onClick={addCourse}
+    className="w-full rounded-md bg-green-600 px-4 py-2 font-semibold text-white shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1"
+  >
+    Add Course
+  </button>
+</div>
+
+
       </div>
 
       <hr className="mt-3" />
-      <div>
-        <h1 className="font-semibold text-xl mt-5 mb-5">Enrolled Students:</h1>
-        <select className="border">
-          <option value="Course 1">Course 1</option>
-          <option value="Course 2">Course 2</option>
-          <option value="Course 3">Course 3</option>
-        </select>
+      <div className="bg-gray-800 min-h-screen p-6 rounded-md shadow-lg">
+  
+  <h1 className="font-extrabold text-3xl text-center bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+  Enrolled Students
+</h1>
 
-    
-      </div>
 
-      {enrolled.length > 0 ? (
-  enrolled.map((userFor, i) => (
-    <div key={i} className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
-      <img src={userFor.studentImg || "default-image.png"} alt="Student Image" />
-      <h1>Student Name: {userFor.userName}</h1>
-      <h1>Course Selected: {userFor.course}</h1>
-      <Link to={`/admin/applicants/${userFor.useruid}`}>
-        <h1 className="hover:underline cursor-pointer">Click to open dynamic page</h1>
-      </Link>
+  {enrolled.length > 0 ? (
+    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {enrolled.map((userFor, i) => (
+        <div
+          key={i}
+          className="bg-gray-900 rounded-xl shadow-lg p-4 flex flex-col items-center text-center hover:shadow-xl transition"
+        >
+          
+          <img
+            src={userFor.studentImg || "default-image.png"}
+            alt="Student"
+            className="h-24 w-24 rounded-full object-cover border-2 border-indigo-500"
+          />
+
+        
+          <h1 className="mt-3 text-lg font-semibold text-white">
+            {userFor.userName}
+          </h1>
+          <p className="text-sm text-gray-400">Course: {userFor.course}</p>
+
+          
+          <Link
+            to={`/admin/applicants/${userFor.useruid}`}
+            className="mt-3 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+          >
+            View Details
+          </Link>
+        </div>
+      ))}
     </div>
-  ))
-) : (
-  <p>No enrolled students found.</p>
-)}
+  ) : (
+    <p className="text-center text-gray-400 mt-6">
+      No enrolled students found.
+    </p>
+  )}
+  </div>
 
 
 
       <hr className="mt-10" />
 
-      <div>
-        <h1 className="font-semibold text-xl mt-5 mb-5">Applicants:</h1>
+      <div className="bg-gray-800 min-h-screen p-8 rounded-md shadow-lg">
+  <h1 className="font-bold text-2xl text-center mb-8 text-white">
+    Applicants
+  </h1>
 
-        <div className="flex justify-center flex-wrap items-center gap-7">
-          
-          {applicantForms.map((userForm, i) => {
-            return(
-              <div  key={i} className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
-              <img src="fdc" alt="Student Image" />
-              <h1>Student Name: {userForm.UsreName}</h1>
-              <h1>Course Selected: {userForm.course}</h1>
-             <Link to={`/admin/applicants/${userForm.useruid}`}>
-              <h1 className="hover:underline cursor-pointer">Click to open dynamic page</h1>
-             </Link>
-            </div>
-            )
-            
-          })}
+  <div className="flex justify-center flex-wrap items-center gap-7">
+    {applicantForms.map((userForm, i) => (
+      <div
+        key={i}
+        className="bg-gray-900 rounded-xl shadow-lg p-5 w-72 flex flex-col items-center text-center hover:shadow-2xl transition"
+      >
+        {/* Student Image */}
+        <img
+          src={userForm.studentImg || "default-image.png"}
+          alt="Student"
+          className="h-24 w-24 rounded-full object-cover border-2 border-indigo-500"
+        />
 
-          
-        </div>
+        {/* Student Info */}
+        <h1 className="mt-3 text-lg font-semibold text-white">
+          {userForm.UsreName}
+        </h1>
+        <p className="text-sm text-gray-400">Course: {userForm.course}</p>
+
+        {/* Button / Link */}
+        <Link
+          to={`/admin/applicants/${userForm.useruid}`}
+          className="mt-4 inline-block rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+        >
+          View Details
+        </Link>
       </div>
+    ))}
+  </div>
+</div>
+
+
     </>
   );
 }
