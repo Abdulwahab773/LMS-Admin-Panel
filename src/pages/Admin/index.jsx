@@ -3,7 +3,6 @@ import {
   collection,
   onSnapshot,
   query,
-  where,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase";
@@ -15,9 +14,11 @@ function AdminPanel() {
   const [coursePrice, setCoursePrice] = useState("");
   const [applicantForms, setApplicantForms] = useState([]);
   // const [courseImg, setCourseImg] = useState("");
+  let [enrolled , setEnrolled] = useState("")
 
   useEffect(() => {
     getApplicants();
+    getenrolledStudent()
   }, []);
 
   const addCourse = async () => {
@@ -47,7 +48,24 @@ function AdminPanel() {
       });
     });
   };
+
+
+
   console.log(applicantForms);
+
+  const getenrolledStudent = () => {
+    const q = query(collection(db, "Enrolled"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const tempArr = [];
+      querySnapshot.forEach((doc) => {
+        tempArr.push(doc.data());
+        setEnrolled(tempArr);
+      });
+    });
+  };
+
+console.log(enrolled);
+
 
   return (
     <>
@@ -99,27 +117,25 @@ function AdminPanel() {
           <option value="Course 3">Course 3</option>
         </select>
 
-        <div className="flex justify-center items-center gap-7">
-          <div className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
-            <img src="fdc" alt="Student Image" />
-            <h1>Student Name: abcd</h1>
-            <h1>Course Selected: Web Development</h1>
-            <h1>Click to open dynamic page</h1>
-          </div>
-          <div className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
-            <img src="fdc" alt="Student Image" />
-            <h1>Student Name: abcd</h1>
-            <h1>Course Selected: Web Development</h1>
-            <h1>Click to open dynamic page</h1>
-          </div>
-          <div className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
-            <img src="fdc" alt="Student Image" />
-            <h1>Student Name: abcd</h1>
-            <h1>Course Selected: Web Development</h1>
-            <h1>Click to open dynamic page</h1>
-          </div>
-        </div>
+    
       </div>
+
+      {enrolled.length > 0 ? (
+  enrolled.map((userFor, i) => (
+    <div key={i} className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
+      <img src={userFor.studentImg || "default-image.png"} alt="Student Image" />
+      <h1>Student Name: {userFor.userName}</h1>
+      <h1>Course Selected: {userFor.course}</h1>
+      <Link to={`/admin/applicants/${userFor.useruid}`}>
+        <h1 className="hover:underline cursor-pointer">Click to open dynamic page</h1>
+      </Link>
+    </div>
+  ))
+) : (
+  <p>No enrolled students found.</p>
+)}
+
+
 
       <hr className="mt-10" />
 
@@ -132,7 +148,7 @@ function AdminPanel() {
             return(
               <div  key={i} className="border h-48 w-68 flex flex-col justify-center items-center gap-5">
               <img src="fdc" alt="Student Image" />
-              <h1>Student Name: {userForm.fullName}</h1>
+              <h1>Student Name: {userForm.UsreName}</h1>
               <h1>Course Selected: {userForm.course}</h1>
              <Link to={`/admin/applicants/${userForm.useruid}`}>
               <h1 className="hover:underline cursor-pointer">Click to open dynamic page</h1>
