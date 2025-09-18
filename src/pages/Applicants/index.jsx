@@ -1,13 +1,15 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { db } from '../../firebase';
 import { useState } from 'react';
+import NavbarCmp from '../../components/navbar';
 
 function ApplicantsPage() {
   const { uid } = useParams(); 
 
   let [dynamicData  ,setDynamicData] = useState({})
+  let navigator = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,7 +57,9 @@ let enrolledStudent = async()=>{
       UserGender: dynamicData.UserGender,
       UserLastQualification: dynamicData.UserLastQualification,
       useruid :dynamicData.useruid,
-      userName : dynamicData.UsreName
+      userName : dynamicData.UsreName,
+      userCourse :dynamicData.userCourseSelect,
+      userImg :dynamicData.userImg
 
 
     });
@@ -69,6 +73,8 @@ let enrolledStudent = async()=>{
       for (const document of querySnapshot.docs) {
         await deleteDoc(doc(db, "applicants", document.id));
         console.log("Applicant deleted with ID:", document.id);
+        navigator("/admin")
+
       }
     } else {
       console.log("No applicant found with this useruid:", uid);
@@ -87,8 +93,12 @@ console.log("Dynamic Data:", dynamicData);
 
 
   return (
-    <div>
-      This is an applicant page
+    <div  className="min-h-screen bg-gray-950">
+
+<NavbarCmp />
+<h1 className="text-center text-2xl font-bold text-indigo-500 mt-8">
+  This is an applicant page
+</h1>
 
 
 
@@ -96,22 +106,30 @@ console.log("Dynamic Data:", dynamicData);
 
 
 
-<h1>{dynamicData.UserCNIC}</h1>
-<h1>{dynamicData.UserAddress}</h1>
-<h1>{dynamicData.UserCity}</h1>
-<h1>{dynamicData.UserCNIC}</h1>
-<h1>{dynamicData.UserCountry}</h1>
-<h1>{dynamicData.UserEmail}</h1>
-<h1>{dynamicData.UserFatherName}</h1>
-<h1>{dynamicData.UserGender}</h1>
-<h1>{dynamicData.UserLastQualification}</h1>
-<h1>{dynamicData.useruid}</h1>
-<h1>{dynamicData.UsreName}</h1>
+<div className="max-w-md mx-auto bg-gray-900 rounded-xl shadow-lg p-6 text-white mt-10">
+  <h2 className="text-2xl font-bold text-center mb-4">Applicant Details</h2>
 
+  <div className="space-y-2">
+    <p><span className="font-semibold">Name:</span> {dynamicData.UsreName}</p>
+    <p><span className="font-semibold">Father's Name:</span> {dynamicData.UserFatherName}</p>
+    <p><span className="font-semibold">course Name:</span> {dynamicData.userCourseSelect}</p>
+    <p><span className="font-semibold">CNIC:</span> {dynamicData.UserCNIC}</p>
+    <p><span className="font-semibold">Address:</span> {dynamicData.UserAddress}</p>
+    <p><span className="font-semibold">City:</span> {dynamicData.UserCity}</p>
+    <p><span className="font-semibold">Country:</span> {dynamicData.UserCountry}</p>
+    <p><span className="font-semibold">Email:</span> {dynamicData.UserEmail}</p>
+    <p><span className="font-semibold">Gender:</span> {dynamicData.UserGender}</p>
+    <p><span className="font-semibold">Qualification:</span> {dynamicData.UserLastQualification}</p>
+    <p><span className="font-semibold">User ID:</span> {dynamicData.useruid}</p>
+  </div>
 
-<br /><br /><br />
- <button onClick={enrolledStudent}>Enrolled</button>
-
+  <button
+    onClick={enrolledStudent}
+    className="mt-6 w-full rounded-md bg-green-600 px-4 py-2 font-semibold text-white shadow-md hover:bg-green-700 transition"
+  >
+    Enroll
+  </button>
+</div>
 
 
 
