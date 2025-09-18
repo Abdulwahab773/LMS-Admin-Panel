@@ -1,10 +1,11 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { auth } from "../../firebase";
+import "animate.css";
 import { useNavigate } from "react-router-dom";
-import NavbarCmp from "../../components/navbar";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
+import Swal from "sweetalert2";
 
-const LoginPage = () => {
+function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -12,67 +13,76 @@ const LoginPage = () => {
   const loginAdmin = () => {
     if (email === "adminwahab/ayan@gmail.com") {
       console.log("Email correct, continue login");
-      
+
       signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        localStorage.setItem("admin-LMS-UId" ,userCredential.user.uid)
-        
-        
-        navigate("/admin");
-      })
-      .catch((error) => {
-        console.log(error);
+        .then((userCredential) => {
+          localStorage.setItem("admin-LMS-UId", userCredential.user.uid);
+          navigate("/admin");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please Write Correct Email & Password!",
       });
-    }else{
-      alert("please admin Login ")
     }
   };
 
-
   return (
-    <div  className="min-h-screen bg-gray-950">
-      <NavbarCmp />
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300">
+      <div className="bg-white shadow-2xl rounded-2xl p-10 w-full max-w-md animate__animated animate__fadeInDown ">
+        {/* Heading */}
+        <h1 className="text-3xl font-bold text-center text-indigo-600 mb-8 animate__animated animate__fadeInDown animate__delay-0.5s">
+          LMS-Admin-Panel
+        </h1>
 
+        {/* Form */}
+        <div className="space-y-6">
+          {/* Email */}
+          <div className="animate__animated animate__fadeInLeft animate__delay-0.5s">
+            <label className="block text-gray-700 font-medium mb-2">
+              Email
+            </label>
+            <input
+              type="email"
+              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              placeholder="Enter your email"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+            />
+          </div>
 
-    
+          {/* Password */}
+          <div className="animate__animated animate__fadeInRight animate__delay-0.5s">
+            <label className="block text-gray-700 font-medium mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-400 outline-none transition"
+            />
+          </div>
 
-
-
-{/* <div className="min-h-screen flex items-center justify-center bg-gray-900"> */}
-  {/* <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-80"> */}
-  <div className="min-h-screen flex items-center justify-center bg-gray-900">
-  <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-80">
-    <h1 className="text-2xl font-bold text-center text-white mb-6">
-      Admin Login
-    </h1>
-
-    <input
-      className="w-full p-3 mb-4 rounded-md border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      onChange={(e) => setEmail(e.target.value)}
-      value={email}
-      type="text"
-      placeholder="Enter Your Email"
-    />
-
-    <input
-      className="w-full p-3 mb-4 rounded-md border border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      onChange={(e) => setPassword(e.target.value)}
-      value={password}
-      type="password"
-      placeholder="Enter Your Password"
-    />
-
-    <button
-      className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-md transition"
-      onClick={loginAdmin}
-    >
-      Login
-    </button>
-  </div>
-</div>
-
+          {/* Login Button */}
+          <div className="animate__animated animate__fadeInUp animate__delay-0.8s">
+            <button
+              type="submit"
+              className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:bg-indigo-700 transition cursor-pointer"
+              onClick={loginAdmin}
+            >
+              Login
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
-};
+}
 
 export default LoginPage;
