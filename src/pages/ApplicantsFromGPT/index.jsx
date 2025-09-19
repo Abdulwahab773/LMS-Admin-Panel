@@ -2,6 +2,7 @@ import React from "react";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/Footer";
+import { Link } from "react-router-dom";
 
 export default function Applicants() {
   const dummyApplicants = [
@@ -9,28 +10,34 @@ export default function Applicants() {
       name: "Sara",
       course: "React Basics",
       img: "https://randomuser.me/api/portraits/women/44.jpg",
+      uid: "nvdjns546589svd5"
     },
     {
       name: "Bilal",
       course: "Node.js Mastery",
       img: "https://randomuser.me/api/portraits/men/32.jpg",
+      uid: "davad11dv54v"
     },
     {
       name: "Hamza",
       course: "Python Intro",
       img: "https://randomuser.me/api/portraits/men/45.jpg",
+      uid: "ascas541cas19"
     },
     {
       name: "Hamza",
       course: "Python Intro",
       img: "https://randomuser.me/api/portraits/men/45.jpg",
+      uid: "kljroig5s15611"
     },
     {
       name: "Hamza",
       course: "Python Intro",
       img: "https://randomuser.me/api/portraits/men/45.jpg",
+      uid: "pknb1dg654af64v"
     },
   ];
+
 
   return (
     <>
@@ -66,9 +73,12 @@ export default function Applicants() {
 
               {/* Actions */}
               <div className="mt-6">
+                <Link to={`/applicants/${applicant.uid}`}>
                 <button className="w-full py-2 px-4 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-lg shadow hover:opacity-90 cursor-pointer">
                   View Application
                 </button>
+                </Link>
+                
               </div>
             </div>
           ))}

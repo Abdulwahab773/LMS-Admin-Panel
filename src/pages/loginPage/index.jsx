@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "animate.css";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../firebase";
+import  auth  from "../../firebase";
 import Swal from "sweetalert2";
 
 function LoginPage() {

@@ -35,6 +35,7 @@ import Applicants from "./pages/ApplicantsFromGPT"
 import Settings from "./pages/Settings";
 import LoginPage from "./pages/loginPage";
 import TeachersSection from "./pages/TeachersSection";
+import BaadMai from "./pages/Applicants/BaadMai";
 
 export default function App() {
   return (
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/applicants" element={<Applicants />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/teachers" element={<TeachersSection />} />
+          <Route path="/applicants/:uid" element={<BaadMai />} />
         </Routes>
         {/* <Footer /> */}
       {/* </div> */}

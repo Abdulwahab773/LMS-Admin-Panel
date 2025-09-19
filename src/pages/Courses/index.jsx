@@ -1,10 +1,78 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Footer from "../../components/Footer";
 import Navbar from "../../components/navbar";
 import Sidebar from "../../components/Sidebar";
+import firebase from "../../firebase";
+import { addDoc, collection, onSnapshot, query } from "firebase/firestore";
 
 export default function Courses() {
+  const db = firebase.db;
+
   const [showModal, setShowModal] = useState(false);
+  const [courseName, setCourseName] = useState("");
+  const [courseDesc, setCourseDesc] = useState("");
+  const [courseFees, setCourseFees] = useState("");
+  const [courseImg, setCourseImg] = useState("");
+  const [allCourses, setAllCourses] = useState([]);
+
+
+  useEffect(() => {
+    getallCourses();
+  }, [setAllCourses])
+
+  let getallCourses = () => {
+    const q = query(collection(db, "courses"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const courses = [];
+      querySnapshot.forEach((doc) => {
+        courses.push(doc.data());
+      });
+      setAllCourses(courses);      
+    });
+  };
+
+
+  let handleFileUpload = async (e) => {
+    let file = e.target.files[0];
+    if (!file) return;
+
+    let data = new FormData();
+    data.append("file", file);
+    data.append("upload_preset", "wahab-ayan-LMS");
+    data.append("cloud_name", "dw0yxu2o0");
+
+    let res = await fetch(
+      "https://api.cloudinary.com/v1_1/dw0yxu2o0/image/upload",
+      {
+        method: "POST",
+        body: data,
+      }
+    );
+
+    let uploadedImageURL = await res.json();
+    console.log("Uploaded Image URL:", uploadedImageURL.url);
+    setCourseImg(uploadedImageURL.url);
+    // return uploadedImageURL;
+  };
+
+  let addNewCourse = async (e) => {
+    e.preventDefault();
+
+    try {
+      const docRef = await addDoc(collection(db, "courses"), {
+        courseName,
+        courseDesc,
+        courseFees,
+        courseImg,
+      });
+
+      setCourseName("");
+      setCourseDesc("");
+      setCourseFees("");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const dummyCourses = [
     {
@@ -52,24 +120,24 @@ export default function Courses() {
 
         {/* Course Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dummyCourses.map((course, idx) => (
+          {allCourses.map((data, idx) => (
             <div
               key={idx}
               className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition"
             >
               <img
-                src={course.img}
-                alt={course.name}
+                src={data.courseImg}
+                alt={data.courseName}
                 className="h-40 w-full object-cover"
               />
               <div className="p-6">
                 <h3 className="font-semibold text-lg text-gray-800">
-                  {course.name}
+                  {data.courseName}
                 </h3>
                 <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {course.description}
+                  {data.courseDesc}
                 </p>
-                <p className="mt-3 text-indigo-600 font-bold">{course.fees}</p>
+                <p className="mt-3 text-indigo-600 font-bold">Rs.{data.courseFees}</p>
                 <div className="flex justify-between mt-4">
                   <button className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer">
                     Edit
@@ -101,25 +169,28 @@ export default function Courses() {
               </div>
 
               {/* Form */}
-              <form className="space-y-5">
+              <form onSubmit={addNewCourse} className="space-y-5">
                 <input
                   type="text"
                   placeholder="Course Name"
+                  onChange={(e) => setCourseName(e.target.value)}
                   className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
                 <textarea
                   placeholder="Description"
                   rows="3"
+                  onChange={(e) => setCourseDesc(e.target.value)}
                   className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 ></textarea>
                 <input
                   type="text"
                   placeholder="Fees"
+                  onChange={(e) => setCourseFees(e.target.value)}
                   className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
                 <input
-                  type="text"
-                  placeholder="Image URL"
+                  type="file"
+                  onChange={handleFileUpload}
                   className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
 
