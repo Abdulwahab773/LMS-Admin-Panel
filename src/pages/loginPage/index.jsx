@@ -17,7 +17,7 @@ function LoginPage() {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           localStorage.setItem("admin-LMS-UId", userCredential.user.uid);
-          navigate("/admin");
+          navigate("/dashboard");
         })
         .catch((error) => {
           console.log(error);
