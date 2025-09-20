@@ -1,42 +1,56 @@
-import React from "react";
+
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";
+import { collection, getDocs } from "@firebase/firestore";
+import { useEffect, useState } from "react";
+import firebase from "../../firebase";
+
+const db = firebase.db;
 
 export default function Applicants() {
-  const dummyApplicants = [
-    {
-      name: "Sara",
-      course: "React Basics",
-      img: "https://randomuser.me/api/portraits/women/44.jpg",
-      uid: "nvdjns546589svd5"
-    },
-    {
-      name: "Bilal",
-      course: "Node.js Mastery",
-      img: "https://randomuser.me/api/portraits/men/32.jpg",
-      uid: "davad11dv54v"
-    },
-    {
-      name: "Hamza",
-      course: "Python Intro",
-      img: "https://randomuser.me/api/portraits/men/45.jpg",
-      uid: "ascas541cas19"
-    },
-    {
-      name: "Hamza",
-      course: "Python Intro",
-      img: "https://randomuser.me/api/portraits/men/45.jpg",
-      uid: "kljroig5s15611"
-    },
-    {
-      name: "Hamza",
-      course: "Python Intro",
-      img: "https://randomuser.me/api/portraits/men/45.jpg",
-      uid: "pknb1dg654af64v"
-    },
-  ];
+
+
+
+  // let [dummyApplicants ,setDummyApplicants] = useState({})
+  let [dummyApplicants, setDummyApplicants] = useState([]);
+
+useEffect(()=>{
+
+  
+  const getApplicants = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "applicants"));
+      console.log("Total Applicants:", querySnapshot.size);
+  
+      const applicantsArray = [];
+      querySnapshot.forEach((doc) => {
+        applicantsArray.push({ id: doc.id, ...doc.data() });
+      });
+  
+      setDummyApplicants(applicantsArray); 
+    } catch (error) {
+      console.error("Error getting applicants: ", error);
+    }
+  };
+  
+  
+  
+  
+  
+  
+  getApplicants()
+  
+},[])
+
+
+
+
+
+
+
+
 
 
   return (
@@ -57,13 +71,13 @@ export default function Applicants() {
               {/* Profile */}
               <div className="flex items-center gap-4">
                 <img
-                  src={applicant.img}
+                  src={applicant.userImg}
                   alt={applicant.name}
                   className="w-16 h-16 rounded-full object-cover border-2 border-indigo-500"
                 />
                 <div>
                   <h3 className="font-semibold text-lg text-gray-800">
-                    {applicant.name}
+                    {applicant.UsreName}
                   </h3>
                   <p className="text-gray-500 text-sm">
                     Applied for {applicant.course}
@@ -71,9 +85,9 @@ export default function Applicants() {
                 </div>
               </div>
 
-              {/* Actions */}
+             
               <div className="mt-6">
-                <Link to={`/applicants/${applicant.uid}`}>
+                <Link to={`/applicants/${applicant.useruid}`}>
                 <button className="w-full py-2 px-4 bg-gradient-to-r from-green-500 to-green-700 text-white rounded-lg shadow hover:opacity-90 cursor-pointer">
                   View Application
                 </button>

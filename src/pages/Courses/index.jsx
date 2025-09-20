@@ -3,7 +3,7 @@ import Footer from "../../components/Footer";
 import Navbar from "../../components/navbar";
 import Sidebar from "../../components/Sidebar";
 import firebase from "../../firebase";
-import { addDoc, collection, onSnapshot, query } from "firebase/firestore";
+import { addDoc, collection, deleteDoc,doc, onSnapshot,query,updateDoc} from "firebase/firestore";
 
 export default function Courses() {
   const db = firebase.db;
@@ -15,22 +15,30 @@ export default function Courses() {
   const [courseImg, setCourseImg] = useState("");
   const [allCourses, setAllCourses] = useState([]);
 
+ 
+  const [editingId, setEditingId] = useState(null);
+  const [editName, setEditName] = useState("");
+  const [editFees, setEditFees] = useState("");
 
   useEffect(() => {
     getallCourses();
-  }, [setAllCourses])
+  }, []);
 
   let getallCourses = () => {
     const q = query(collection(db, "courses"));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const courses = [];
-      querySnapshot.forEach((doc) => {
-        courses.push(doc.data());
+      querySnapshot.forEach((docSnap) => {
+        courses.push({
+          id: docSnap.id,
+          ...docSnap.data(),
+        });
       });
-      setAllCourses(courses);      
+      setAllCourses(courses);
     });
-  };
 
+    return unsubscribe;
+  };
 
   let handleFileUpload = async (e) => {
     let file = e.target.files[0];
@@ -50,16 +58,14 @@ export default function Courses() {
     );
 
     let uploadedImageURL = await res.json();
-    console.log("Uploaded Image URL:", uploadedImageURL.url);
     setCourseImg(uploadedImageURL.url);
-    // return uploadedImageURL;
   };
 
   let addNewCourse = async (e) => {
     e.preventDefault();
 
     try {
-      const docRef = await addDoc(collection(db, "courses"), {
+      await addDoc(collection(db, "courses"), {
         courseName,
         courseDesc,
         courseFees,
@@ -69,37 +75,42 @@ export default function Courses() {
       setCourseName("");
       setCourseDesc("");
       setCourseFees("");
+      setCourseImg("");
     } catch (error) {
       console.log(error);
     }
   };
 
-  const dummyCourses = [
-    {
-      name: "React Basics",
-      description: "Learn the fundamentals of React.js and component-based UI.",
-      fees: "$100",
-      img: "https://via.placeholder.com/300x200",
-    },
-    {
-      name: "Node.js Mastery",
-      description: "Backend development with Node.js and Express.js.",
-      fees: "$120",
-      img: "https://via.placeholder.com/300x200",
-    },
-    {
-      name: "Python Intro",
-      description: "Basics of Python programming and scripting.",
-      fees: "$90",
-      img: "https://via.placeholder.com/300x200",
-    },
-    {
-      name: "UI/UX Design",
-      description: "Design principles, wireframing, and prototyping.",
-      fees: "$150",
-      img: "https://via.placeholder.com/300x200",
-    },
-  ];
+  let deleteCourse = async (deleteId) => {
+    try {
+      let adminUid = localStorage.getItem("admin-LMS-UId");
+      if (!adminUid) {
+        console.error("User not logged in");
+        return;
+      }
+
+      const docRef = doc(db, "courses", deleteId);
+      await deleteDoc(docRef);
+
+      console.log("Course deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting course: ", error);
+    }
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      const docRef = doc(db, "courses", id);
+      await updateDoc(docRef, {
+        courseName: editName,
+        courseFees: editFees,
+      });
+      console.log("Course updated successfully!");
+      setEditingId(null); 
+    } catch (error) {
+      console.error("Error updating course: ", error);
+    }
+  };
 
   return (
     <>
@@ -107,7 +118,7 @@ export default function Courses() {
       <Navbar />
 
       <div className="md:ml-64 pt-20 px-8">
-        {/* Header */}
+        
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-gray-700">Manage Courses</h2>
           <button
@@ -118,11 +129,11 @@ export default function Courses() {
           </button>
         </div>
 
-        {/* Course Cards */}
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {allCourses.map((data, idx) => (
+          {allCourses.map((data) => (
             <div
-              key={idx}
+              key={data.id}
               className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition"
             >
               <img
@@ -131,31 +142,75 @@ export default function Courses() {
                 className="h-40 w-full object-cover"
               />
               <div className="p-6">
-                <h3 className="font-semibold text-lg text-gray-800">
-                  {data.courseName}
-                </h3>
-                <p className="text-gray-500 text-sm mt-2 line-clamp-2">
-                  {data.courseDesc}
-                </p>
-                <p className="mt-3 text-indigo-600 font-bold">Rs.{data.courseFees}</p>
-                <div className="flex justify-between mt-4">
-                  <button className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer">
-                    Edit
-                  </button>
-                  <button className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer">
-                    Delete
-                  </button>
-                </div>
+                {editingId === data.id ? (
+                 
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="text"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="border px-2 py-1 rounded"
+                    />
+                    <input
+                      type="text"
+                      value={editFees}
+                      onChange={(e) => setEditFees(e.target.value)}
+                      className="border px-2 py-1 rounded"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleUpdate(data.id)}
+                        className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="px-4 py-1 bg-gray-400 text-white rounded hover:bg-gray-500"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                
+                  <div className="flex flex-col gap-2">
+                    <h3 className="font-semibold text-lg text-gray-800">
+                      {data.courseName}
+                    </h3>
+                    <p className="text-indigo-600 font-bold">
+                      Rs.{data.courseFees}
+                    </p>
+                    <div className="flex justify-between">
+                      <button
+                        onClick={() => {
+                          setEditingId(data.id);
+                          setEditName(data.courseName);
+                          setEditFees(data.courseFees);
+                        }}
+                        className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteCourse(data.id)}
+                        className="px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Add Course Modal */}
+        
         {showModal && (
           <div className="fixed inset-0 backdrop-blur-sm flex justify-center items-center z-50 animate-fadeIn">
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg transform scale-95 animate-slideUp">
-              {/* Header */}
+              
               <div className="flex justify-between items-center mb-6 border-b pb-3">
                 <h2 className="text-2xl font-bold text-gray-800">
                   ➕ Add New Course
@@ -168,7 +223,7 @@ export default function Courses() {
                 </button>
               </div>
 
-              {/* Form */}
+             
               <form onSubmit={addNewCourse} className="space-y-5">
                 <input
                   type="text"
@@ -194,7 +249,7 @@ export default function Courses() {
                   className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />
 
-                {/* Actions */}
+                
                 <div className="flex justify-end gap-4 pt-4">
                   <button
                     type="button"
