@@ -9,13 +9,24 @@ import Settings from "./pages/Settings";
 import LoginPage from "./pages/loginPage";
 import TeachersSection from "./pages/TeachersSection";
 import BaadMai from "./pages/Applicants/BaadMai";
+import AuthRoute from "./Routes/AuthRoute";
+import PrivateRoute from "./Routes/PrivateRoute";
 
 export default function App() {
   return (
     <>
      
         <Routes>
+
+
+        <Route  element={<AuthRoute />}>
+        
           <Route index element={<LoginPage />} />
+        
+        </Route>
+
+        <Route element={<PrivateRoute />} >
+
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/students" element={<Students />} />
@@ -23,6 +34,7 @@ export default function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/teachers" element={<TeachersSection />} />
           <Route path="/applicants/:uid" element={<BaadMai />} />
+        </Route>
         </Routes>
        
     </>
