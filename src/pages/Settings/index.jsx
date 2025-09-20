@@ -1,24 +1,56 @@
-import React from "react";
+import React, {  useState } from "react";
 import { FaUserPlus, FaUniversity, FaRegCreditCard } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
 import Sidebar from "../../components/Sidebar";
 import Navbar from "../../components/navbar";
+import { addDoc, collection } from "firebase/firestore";
+import firebase from "../../firebase";
 
 export default function Settings() {
+  const db = firebase.db;
+let [accountHolderName, SetAccountHolderName] = useState("")
+let [bankName ,setBankName] = useState("")
+let [accountNumber ,setAccountNumber] =useState("")
+
+
+let addbankDetails = async (e) => {
+  e.preventDefault();
+
+  try {
+    await addDoc(collection(db, "bankDetails"), {
+      accountHolderName,
+      bankName,
+      accountNumber,
+    });
+
+    // Reset fields
+    SetAccountHolderName("");
+    setBankName("");
+    setAccountNumber("");
+
+    console.log("Bank details added successfully!");
+  } catch (error) {
+    console.log("Error adding bank details:", error);
+  }
+};
+
+
+
+
   return (
     <>
       <Sidebar />
       <Navbar />
       <div className="pt-20 md:ml-64 px-8">
-        {/* Page Heading */}
+        
         <h2 className="text-3xl font-bold text-gray-800 mb-2">Settings</h2>
         <p className="text-gray-500 mb-8">
           Manage your teachers and bank details easily.
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Teachers Section Button */}
+         
           <div className="bg-white rounded-2xl shadow-lg p-8 border cursor-pointer transition flex flex-col items-center justify-center text-center group">
             <div className="p-4 bg-indigo-100 text-indigo-600 rounded-full mb-4 group-hover:scale-110 transition">
               <FaUserPlus size={28} />
@@ -48,22 +80,35 @@ export default function Settings() {
 
             <div className="space-y-4">
               <input
+              onChange={(e)=>{
+                SetAccountHolderName(e.target.value)
+              }}
+              value={accountHolderName}
+
                 type="text"
                 placeholder="Account Holder Name"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
               <input
+              onChange={(e)=>{
+                setBankName(e.target.value)
+                              }}
+                              value={bankName}
                 type="text"
                 placeholder="Bank Name"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
               <input
+              onChange={(e)=>{
+                setAccountNumber(e.target.value)
+                              }}
+                              value={accountNumber}
                 type="text"
                 placeholder="Account Number"
                 className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 outline-none"
               />
 
-              <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer">
+              <button onClick={addbankDetails} className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition cursor-pointer">
                 <FaRegCreditCard /> Save Details
               </button>
             </div>

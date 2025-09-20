@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaBookOpen,
   FaUserGraduate,
@@ -13,89 +13,145 @@ import Card from "../../components/Cards";
 import Footer from "../../components/Footer";
 import Navbar from "../../components/navbar";
 import Sidebar from "../../components/Sidebar";
+import { collection, getDocs } from "@firebase/firestore";
+import firebase from "../../firebase";
+
+const db = firebase.db;
 
 export default function Dashboard() {
   const navigate = useNavigate();
 
-  const courses = [
-    {
-      title: "React Basics",
-      desc: "Intro to React fundamentals",
-      icon: <FaCode className="text-indigo-600" size={28} />,
-    },
-    {
-      title: "Node.js Mastery",
-      desc: "Backend with Node.js",
-      icon: <FaNodeJs className="text-green-600" size={28} />,
-    },
-    {
-      title: "UI/UX Design",
-      desc: "Learn design principles",
-      icon: <FaPaintBrush className="text-pink-500" size={28} />,
-    },
-    {
-      title: "Python for Beginners",
-      desc: "Start coding with Python",
-      icon: <FaPython className="text-yellow-500" size={28} />,
-    },
-  ];
+  // const courses = [
+  //   {
+  //     title: "React Basics",
+  //     desc: "Intro to React fundamentals",
+  //     icon: <FaCode className="text-indigo-600" size={28} />,
+  //   },
+  //   {
+  //     title: "Node.js Mastery",
+  //     desc: "Backend with Node.js",
+  //     icon: <FaNodeJs className="text-green-600" size={28} />,
+  //   },
+  //   {
+  //     title: "UI/UX Design",
+  //     desc: "Learn design principles",
+  //     icon: <FaPaintBrush className="text-pink-500" size={28} />,
+  //   },
+  //   {
+  //     title: "Python for Beginners",
+  //     desc: "Start coding with Python",
+  //     icon: <FaPython className="text-yellow-500" size={28} />,
+  //   },
+  // ];
 
-  const applicants = [
-    {
-      name: "Sara",
-      course: "React Basics",
-      avatar: "https://i.pravatar.cc/150?img=47",
-    },
-    {
-      name: "Bilal",
-      course: "Node.js Mastery",
-      avatar: "https://i.pravatar.cc/150?img=12",
-    },
-    {
-      name: "Hamza",
-      course: "UI/UX Design",
-      avatar: "https://i.pravatar.cc/150?img=33",
-    },
-    {
-      name: "Ayesha",
-      course: "Python for Beginners",
-      avatar: "https://i.pravatar.cc/150?img=22",
-    },
-  ];
+
+let  [applicantsSize ,setapplicantsSize] = useState("")
+let  [courseSize ,SetcourseSize] = useState("")
+let [enrolled , setEnrolled ] = useState("")
+
+let [applicants , setapplicants] = useState([])
+let [courses ,setCourses] = useState([])
+
+  
+  const getApplicants = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "applicants"));
+      
+      setapplicantsSize(querySnapshot.size);
+  
+      let applicantsArr = [];
+      querySnapshot.forEach((doc) => {
+       
+        applicantsArr.push(doc.data()); 
+      });
+  
+      setapplicants(applicantsArr); 
+    } catch (error) {
+      console.error("Error getting applicants: ", error);
+    }
+  };
+
+
+  const getCourses = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "courses"));
+      // console.log("Total Courses:", querySnapshot.size);
+      SetcourseSize(querySnapshot.size)
+      let coursesArr = [];
+      querySnapshot.forEach((doc) => {
+        coursesArr.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+  
+     
+      setCourses(coursesArr); 
+    } catch (error) {
+      console.error("Error getting courses: ", error);
+    }
+  };
+
+  
+  const getEnrolled = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "Enrolled"));
+      console.log("Total Enrolled Students:", querySnapshot.size);
+      setEnrolled(querySnapshot.size)
+  
+      querySnapshot.forEach((doc) => {
+        console.log("Enrolled Student:", doc.id, doc.data());
+      });
+    } catch (error) {
+      console.error("Error getting enrolled students: ", error);
+    }
+  };
+  
+  
+  useEffect(()=>{
+    getCourses();
+    getEnrolled()
+
+    getApplicants();
+
+  },[])
+  
+
+
 
   return (
     <>
       <Sidebar />
       <Navbar />
       <div className="md:ml-64 pt-20 px-8 min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Heading */}
+        
         <h2 className="text-3xl font-bold text-gray-800 mb-8 tracking-tight">
           Dashboard Overview
         </h2>
 
-        {/* Stats Section */}
+        
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <Card
             title="All Courses"
-            value="5"
+            value={courseSize}
             icon={<FaBookOpen size={36} />}
             color="from-purple-500 to-purple-700"
           />
           <Card
             title="Enrolled Students"
-            value="25"
+            value={enrolled}
             icon={<FaUserGraduate size={36} />}
             color="from-blue-500 to-blue-700"
           />
           <Card
             title="Applicants"
-            value="10"
+            value={applicantsSize}
             icon={<FaUserPlus size={36} />}
             color="from-green-500 to-green-700"
           />
         </div>
 
-        {/* Recent Courses Section */}
+        
         <div className="mt-12 bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-gray-700">
@@ -109,24 +165,28 @@ export default function Dashboard() {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.slice(0, 3).map((course, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 p-5 rounded-xl shadow hover:shadow-md transition flex items-start gap-4"
-              >
-                <div className="p-3 bg-gray-200 rounded-lg">{course.icon}</div>
-                <div>
-                  <h4 className="font-semibold text-lg text-gray-700">
-                    {course.title}
-                  </h4>
-                  <p className="text-sm text-gray-500 mt-2">{course.desc}</p>
-                </div>
-              </div>
-            ))}
+          {courses.slice(0, 3).map((course, idx) => (
+  <div
+    key={course.id}
+    className="bg-gray-50 p-5 rounded-xl shadow hover:shadow-md transition flex items-start gap-4"
+  >
+    <div className="p-3 bg-gray-200 rounded-lg">
+      {/* Agar Firestore mein icon nahi hai to placeholder use karo */}
+      {course.icon || "📘"}
+    </div>
+    <div>
+      <h4 className="font-semibold text-lg text-gray-700">
+        {course.courseName}
+      </h4>
+      <p className="text-sm text-gray-500 mt-2">{course.courseDesc}</p>
+    </div>
+  </div>
+))}
+
           </div>
         </div>
 
-        {/* New Applicants Section */}
+      
         <div className="mt-12 bg-white shadow-lg rounded-2xl p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-xl font-semibold text-gray-700">
@@ -140,26 +200,28 @@ export default function Dashboard() {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {applicants.slice(0, 3).map((app, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 p-5 rounded-xl shadow hover:shadow-md transition flex items-center gap-4"
-              >
-                <img
-                  src={app.avatar}
-                  alt={app.name}
-                  className="w-12 h-12 rounded-full object-cover"
-                />
-                <div>
-                  <h4 className="font-semibold text-lg text-gray-700">
-                    {app.name}
-                  </h4>
-                  <p className="text-sm text-gray-500">
-                    Applied for {app.course}
-                  </p>
-                </div>
-              </div>
-            ))}
+           
+
+{applicants.slice(0, 3).map((app, idx) => (
+  <div key={idx} className="bg-gray-50 p-5 rounded-xl shadow hover:shadow-md transition flex items-center gap-4">
+    <img
+      src={app.userImg}
+      alt={app.UsreName}
+      className="w-12 h-12 rounded-full object-cover"
+    />
+    <div>
+      <h4 className="font-semibold text-lg text-gray-700">
+        {app.UsreName}
+      </h4>
+      <p className="text-sm text-gray-500">
+        Applied for {app.userCourseSelect}
+      </p>
+    </div>
+  </div>
+))}
+
+
+
           </div>
         </div>
       </div>

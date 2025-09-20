@@ -1,30 +1,3 @@
-// import { Route, Routes } from "react-router-dom";
-// import "./App.css";
-// // import AdminPanel from "./pages/Admin";
-// import ApplicantsPage from "./pages/Applicants";
-// import AuthRoute from "./Routes/AuthRoute";
-// import PrivateRoute from "./Routes/PrivateRoute";
-// import AdminMain from "./pages/MainPage/AdminMain";
-// import CoursesPage from "./pages/CoursesPage";
-
-// function App() {
-//   return (
-//     <Routes>
-//       <Route element={<AuthRoute />}>
-//         <Route path="/" element={<LoginPage />} />
-//       </Route>
-
-//       <Route element={<PrivateRoute />}>
-//         <Route path="/admin" element={<AdminMain />} />
-//         <Route path="admin/courses" element={<CoursesPage />} />
-//         <Route path="/admin/applicants/:uid" element={<ApplicantsPage />} />
-//       </Route>
-//     </Routes>
-//   );
-// }
-
-// export default App;
-
 
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
@@ -40,9 +13,7 @@ import BaadMai from "./pages/Applicants/BaadMai";
 export default function App() {
   return (
     <>
-      {/* <Sidebar />
-      <Navbar /> */}
-      {/* <div className="pt-16 min-h-screen bg-gray-100"> */}
+     
         <Routes>
           <Route index element={<LoginPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
@@ -53,8 +24,7 @@ export default function App() {
           <Route path="/teachers" element={<TeachersSection />} />
           <Route path="/applicants/:uid" element={<BaadMai />} />
         </Routes>
-        {/* <Footer /> */}
-      {/* </div> */}
+       
     </>
   );
 }
