@@ -4,7 +4,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 function AuthRoute() {
   return (
  !localStorage.getItem("admin-LMS-UId") ?
- <Outlet /> :<Navigate to={"/admin"} />
+ <Outlet /> :<Navigate to={"/dashboard"} />
 
 
 )
